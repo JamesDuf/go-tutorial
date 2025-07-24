@@ -1,0 +1,27 @@
+//simple example
+package main
+
+import "fmt"
+
+func main() {
+	var c = make(chan int) // create a channel of type int
+
+	//This below would give a deadlock error if uncommented, as the channel is unbuffered and no goroutine is receiving from it
+	/*
+		c <- 1                 // send a value to the channel //special syntax
+		var i = <-c            // receive a value from the channel
+		fmt.Println(i)         // print the value received from the channel
+	*/
+
+	go process(c)      // start a goroutine that sends a value to the channel
+	for i := range c { // receive values from the channel in a loop
+		fmt.Println(i) // receive the value from the channel and print it directly without storing it in a variable
+	}
+}
+
+func process(c chan int) {
+	defer close(c) // ensure the channel is closed when done //defer just means that this line will be executed at the end of the function, even if there is an error
+	for i := 0; i < 5; i++ {
+		c <- i // send the value of i to the channel
+	}
+}
